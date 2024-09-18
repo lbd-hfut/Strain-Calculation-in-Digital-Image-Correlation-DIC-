@@ -1,4 +1,8 @@
 # Strain-Calculation-in-Digital-Image-Correlation-DIC-
+
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python Version](https://img.shields.io/badge/python-3.7%2B-blue.svg)](https://www.python.org/downloads/)
+
 The application and comparison of deep learning methods and the subset least squares method in DIC (Digital Image Correlation) strain computation.
 
 ## Strain Calculation from Displacement Subsets
