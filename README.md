@@ -61,7 +61,7 @@ step = 1
 SmoothLen = 3
 
 # Call the function to compute strain components
-Ex, Ey, Exy = Strain_from_Displacement_Subset(u, v, flag, step, SmoothLen)
+Ex, Ey, Exy = Strain_f_Disp_Subset(u, v, flag, step, SmoothLen)
 
 # Output the results
 print("Ex: \n", Ex)
