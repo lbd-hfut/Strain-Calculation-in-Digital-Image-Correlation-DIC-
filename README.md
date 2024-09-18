@@ -81,10 +81,35 @@ print("Exy: \n", Exy)
    The displacement fields and the flag matrix are extended by padding the boundaries with `NaN` values. This ensures that edge pixels can still be processed.
 
 4. **Displacement Gradients Estimation**  
-   A least-squares method is used to estimate the local displacement gradients in each window.
+   A least-squares method is used to estimate the local displacement gradients in each window.  
+   For each window, a system of equations is solved using least squares to find the displacement gradients. The displacement field in the window is modeled as a linear function of position:
+   
+   \[
+   u(x, y) = a_0 + a_1 y + a_2 x
+   \]
+   \[
+   v(x, y) = b_0 + b_1 y + b_2 x
+   \]
+   
+   The displacement gradients \(\frac{\partial u}{\partial x}\), \(\frac{\partial u}{\partial y}\), \(\frac{\partial v}{\partial x}\), and \(\frac{\partial v}{\partial y}\) are then approximated by the coefficients \(a_1\), \(a_2\), \(b_1\), and \(b_2\), respectively, from the least-squares fit.
 
 5. **Strain Calculation**  
-   The strain components are calculated from the displacement gradients.
+   Using the displacement gradients obtained from the least-squares estimation, the strain components are calculated as follows:
+   
+   - Normal strain in the \(x\)-direction (\(E_x\)):
+     \[
+     E_x = \frac{\partial u}{\partial x} = a_2
+     \]
+   
+   - Normal strain in the \(y\)-direction (\(E_y\)):
+     \[
+     E_y = \frac{\partial v}{\partial y} = b_1
+     \]
+   
+   - Shear strain (\(E_{xy}\)):
+     \[
+     E_{xy} = \frac{1}{2} \left( \frac{\partial u}{\partial y} + \frac{\partial v}{\partial x} \right) = \frac{1}{2} \left( a_1 + b_2 \right)
+     \]
 
 6. **Result Cropping**  
    The extended regions of the strain matrices are trimmed to match the original displacement field size.
@@ -93,3 +118,4 @@ print("Exy: \n", Exy)
 - The function assumes that the displacement fields (`u`, `v`) and the flag matrix (`flag`) are well-defined and of the same dimensions.
 - The method is based on fitting a plane to the displacement data in local windows, so it requires valid data points in each window to work properly.
 - If a window has fewer than 4 valid points, the function will return `NaN` for that location.
+
