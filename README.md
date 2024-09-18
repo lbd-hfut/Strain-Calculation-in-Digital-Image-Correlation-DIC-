@@ -5,7 +5,7 @@ The application and comparison of deep learning methods and the subset least squ
 
 This Python function, `Strain_from_Displacement_Subset`, computes strain components (Ex, Ey, Exy) from 2D displacement fields (`u`, `v`) using a subset method. The method applies a least-squares fitting technique to calculate strain based on the local displacement gradients. The following documentation describes the function's purpose, parameters, and usage.
 
-### Function: `Strain_from_Displacement_Subset`
+### Function: `Strain_f_Disp_Subset.py`
 
 #### Purpose
 The function calculates strain components (`Ex`, `Ey`, and `Exy`) from the displacement fields (`u`, `v`) using a sliding window technique. The displacement gradients within each window are estimated using least-squares fitting, and the strains are derived from these gradients.
