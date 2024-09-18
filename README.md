@@ -84,32 +84,26 @@ print("Exy: \n", Exy)
    A least-squares method is used to estimate the local displacement gradients in each window.  
    For each window, a system of equations is solved using least squares to find the displacement gradients. The displacement field in the window is modeled as a linear function of position:
    
-   \[
-   u(x, y) = a_0 + a_1 y + a_2 x
-   \]
-   \[
-   v(x, y) = b_0 + b_1 y + b_2 x
-   \]
+   `u(x, y) = a_0 + a_1 y + a_2 x`
    
-   The displacement gradients \(\frac{\partial u}{\partial x}\), \(\frac{\partial u}{\partial y}\), \(\frac{\partial v}{\partial x}\), and \(\frac{\partial v}{\partial y}\) are then approximated by the coefficients \(a_1\), \(a_2\), \(b_1\), and \(b_2\), respectively, from the least-squares fit.
+   `v(x, y) = b_0 + b_1 y + b_2 x`
+   
+   The displacement gradients `∂u/∂x`, `∂u/∂y`, `∂v/∂x`, and `∂v/∂y` are then approximated by the coefficients `a_1`, `a_2`, `b_1`, and `b_2`, respectively, from the least-squares fit.
 
 5. **Strain Calculation**  
    Using the displacement gradients obtained from the least-squares estimation, the strain components are calculated as follows:
    
-   - Normal strain in the \(x\)-direction (\(E_x\)):
-     \[
-     E_x = \frac{\partial u}{\partial x} = a_2
-     \]
-   
-   - Normal strain in the \(y\)-direction (\(E_y\)):
-     \[
-     E_y = \frac{\partial v}{\partial y} = b_1
-     \]
-   
-   - Shear strain (\(E_{xy}\)):
-     \[
-     E_{xy} = \frac{1}{2} \left( \frac{\partial u}{\partial y} + \frac{\partial v}{\partial x} \right) = \frac{1}{2} \left( a_1 + b_2 \right)
-     \]
+- **Normal strain in the x-direction (Ex):**
+
+  Ex = ∂u/∂x = a_2
+
+- **Normal strain in the y-direction (Ey):**
+
+  Ey = ∂v/∂y = b_1
+
+- **Shear strain (Exy):**
+
+  Exy = 1/2 * (∂u/∂y + ∂v/∂x) = 1/2 * (a_1 + b_2)
 
 6. **Result Cropping**  
    The extended regions of the strain matrices are trimmed to match the original displacement field size.
