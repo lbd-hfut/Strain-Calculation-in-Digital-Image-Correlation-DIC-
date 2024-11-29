@@ -67,6 +67,39 @@ class PositionalEncoding:
             encodings.append(fn(x))
         return torch.cat(encodings, dim=-1)
 
+
+# Define activation functions
+activation_dict = {
+    "sin": torch.sin,
+    "relu": nn.ReLU(),
+    "tanh": nn.Tanh(),
+}
+
+class MscaleDNN(nn.Module):
+    def __init__(self, input_dim, hidden_units, output_dim, scales, activation):
+        super(MscaleDNN, self).__init__()
+        self.scales = scales
+        self.activation = activation_dict[activation]
+        self.subnets = nn.ModuleList()
+
+        for scale in scales:
+            layers = []
+            prev_units = input_dim
+            for units in hidden_units:
+                layers.append(nn.Linear(prev_units, units))
+                layers.append(self.activation)
+                prev_units = units
+            layers.append(nn.Linear(prev_units, output_dim))
+            self.subnets.append(nn.Sequential(*layers))
+
+    def forward(self, x):
+        outputs = []
+        for i, scale in enumerate(self.scales):
+            scaled_x = x * scale
+            outputs.append(self.subnets[i](scaled_x))
+        return torch.sum(torch.stack(outputs), dim=0)
+
+
 # # Example usage
 # # Input is a 3D coordinate (e.g., x, y, z)
 # positions = torch.tensor([[0.1, 0.2, 0.3], [0.4, 0.5, 0.6]])  # Example 3D positions

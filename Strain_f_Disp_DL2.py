@@ -3,15 +3,41 @@ from torch.utils.data import DataLoader
 from PIL import Image
 import numpy as np
 import scipy.io as sio
-from FCNN import DNN
+from FCNN import MscaleDNN
 from EarlyStop import EarlyStopping
 from Strain_readData import DisplacementDataset, collate_fn_D
 
+# Set random seed for reproducibility
+def set_seed(seed):
+    torch.manual_seed(seed)
+    np.random.seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
+
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+'''Training parameters'''
+params = {
+    "seed": 0,
+    "dim": 2,
+    "hidden_units": [20, 20, 20],
+    "scales": [1, 2, 4, 8, 16],
+    "activation": "sin",
+    "learning_rate": 1e-3,
+    "total_steps": 1000,
+    "batch_size": 256,
+    "roi_path": "./restructed_image/ROI.bmp",
+    "displacement": 'fpb_displacement.mat',
+    "ep_patience": 20,
+    "ep_delta": 0.001,
+    "checkpoint": './checkpoint/checkpoint_adam.pth',
+    
+}
 
 
 '''Data preparation'''
-roi_path = "./restructed_image/ROI.bmp"
+roi_path = params["roi_path"]
 roi = Image.open(roi_path).convert('L')
 roi = np.array(roi); roi = roi > 0
 
@@ -19,29 +45,36 @@ H,L = roi.shape
 y = np.linspace(-1, 1, H); x = np.linspace(-1, 1, L); 
 IX, IY = np.meshgrid(x, y)
 
-displacement = sio.loadmat('fpb_displacement.mat')
+displacement = sio.loadmat(params["displacement"])
 u = displacement['u']
 v = displacement['v']
 
 early_stop_adam = EarlyStopping(
-        patience=20, delta=0.001, 
-        path='./checkpoint/checkpoint_adam.pth')
+        patience=params["ep_patience"], 
+        delta=params["ep_delta"], 
+        path=params["checkpoint"])
 
 '''To tensor'''
-IX = torch.tensor(IX, requires_grad=True).float().to(device)
-IY = torch.tensor(IY, requires_grad=True).float().to(device)
+IX = torch.tensor(IX, requires_grad=False).float().to(device)
+IY = torch.tensor(IY, requires_grad=False).float().to(device)
 
 '''Create dataset and dataloader'''
 train_dataset = DisplacementDataset(u, v, roi)
 N = len(train_dataset)
-train_loader = DataLoader(train_dataset, batch_size=256, shuffle=True, collate_fn=collate_fn_D)
+train_loader = DataLoader(train_dataset, batch_size=params["batch_size"], shuffle=True, collate_fn=collate_fn_D)
 
 '''Initialize model, loss function, and optimizer'''
-layers = [2, 50, 50, 50, 2]
-model = DNN(layers).to(device)
+model = MscaleDNN(
+    input_dim=params["dim"],
+    hidden_units=params["hidden_units"],
+    output_dim=2,
+    scales=params["scales"],
+    activation=params["activation"]
+).to(device)
+
 criterion = torch.nn.MSELoss()
 mae = torch.nn.L1Loss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+optimizer = torch.optim.Adam(model.parameters(), lr=params["learning_rate"])
 
 print("Training start!")
 # Training loop
