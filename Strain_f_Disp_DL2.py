@@ -27,11 +27,11 @@ params = {
     "learning_rate": 1e-3,
     "total_steps": 1000,
     "batch_size": 256,
-    "roi_path": "./restructed_image/ROI.bmp",
-    "displacement": 'fpb_displacement.mat',
+    "roi_path": "./test_data/restructed_image/ROI.bmp",
+    "displacement": './test_data/uvmat/star_displacement.mat',
     "ep_patience": 20,
     "ep_delta": 0.001,
-    "checkpoint": './checkpoint/checkpoint_adam.pth',
+    "checkpoint": './checkpoint/checkpoint_adam_star.pth',
     
 }
 
