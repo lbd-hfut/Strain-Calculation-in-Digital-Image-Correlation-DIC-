@@ -67,12 +67,29 @@ class PositionalEncoding:
             encodings.append(fn(x))
         return torch.cat(encodings, dim=-1)
 
+class SinActivation(nn.Module):
+    def __init__(self):
+        super(SinActivation, self).__init__()
+    def forward(self, x):
+        return torch.sin(x)
+
+class PhiActivation(nn.Module):
+    def __init__(self):
+        super(PhiActivation, self).__init__()
+        self.relu = nn.ReLU()
+    def forward(self, x):
+        y = self.relu(x)**2 - 3*self.relu(x-1)**2 + 3*self.relu(x-2)**2 - self.relu(x-3)**2
+        return y
 
 # Define activation functions
 activation_dict = {
-    "sin": torch.sin,
-    "relu": nn.ReLU(),
-    "tanh": nn.Tanh(),
+    'relu': nn.ReLU(),
+    'sigmoid': nn.Sigmoid(),
+    'tanh': nn.Tanh(),
+    'leaky_relu': nn.LeakyReLU(),
+    'softplus': nn.Softplus(),
+    'sin': SinActivation(),
+    'phi': PhiActivation(),
 }
 
 class MscaleDNN(nn.Module):
@@ -85,9 +102,10 @@ class MscaleDNN(nn.Module):
         for scale in scales:
             layers = []
             prev_units = input_dim
-            for units in hidden_units:
+            for i, units in enumerate(hidden_units):
                 layers.append(nn.Linear(prev_units, units))
-                layers.append(self.activation)
+                if i < len(hidden_units)-1:
+                    layers.append(self.activation)
                 prev_units = units
             layers.append(nn.Linear(prev_units, output_dim))
             self.subnets.append(nn.Sequential(*layers))
@@ -110,3 +128,22 @@ class MscaleDNN(nn.Module):
 
 # print(encoded_positions.shape)  # Should be [N, 3 * (2 * 10)]
 # print(encoded_positions)        # Encoded values for the positions
+
+
+# # Example usage
+# input_dim = 2          
+# hidden_units = [64, 32] 
+# output_dim = 2          
+# scales = [0.5, 1.0, 2.0]  
+# activation = 'sin'     
+
+# model = MscaleDNN(input_dim, hidden_units, output_dim, scales, activation)
+
+# print(model)
+
+# x = torch.randn(4, input_dim)
+
+# output = model(x)
+
+# print("Model output:")
+# print(output)

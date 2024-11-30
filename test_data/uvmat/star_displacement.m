@@ -28,7 +28,7 @@ v = 2 * (v1 - min_val) / (max_val - min_val) - 1;
 u = zeros(H, L);
 
 [m,n] = size(u);
-mean_value = 0; std_value = 0.2; 
+mean_value = 0; std_value = 0.0; 
 white_noise_matrix_u = mean_value + std_value * randn(m, n);
 white_noise_matrix_v = mean_value + std_value * randn(m, n);
 

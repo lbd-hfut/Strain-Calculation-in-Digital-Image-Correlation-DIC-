@@ -21,18 +21,18 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 params = {
     "seed": 0,
     "dim": 2,
-    "hidden_units": [20, 20, 20],
-    "scales": [1, 2, 4, 8, 16],
-    "activation": "sin",
+    "hidden_units": [50, 50, 50],
+    "scales": [1, 2, 4, 8, 16, 32, 64],
+    "activation": "phi",
     "learning_rate": 1e-3,
-    "total_steps": 1000,
-    "batch_size": 256,
+    "total_steps": 50,
+    "batch_size": 1024*4,
     "roi_path": "./test_data/restructed_image/ROI.bmp",
     "displacement": './test_data/uvmat/star_displacement.mat',
     "ep_patience": 20,
-    "ep_delta": 0.001,
+    "ep_delta": 0.0001,
     "checkpoint": './checkpoint/checkpoint_adam_star.pth',
-    
+    "shuffle": True, 
 }
 
 
@@ -61,7 +61,7 @@ IY = torch.tensor(IY, requires_grad=False).float().to(device)
 '''Create dataset and dataloader'''
 train_dataset = DisplacementDataset(u, v, roi)
 N = len(train_dataset)
-train_loader = DataLoader(train_dataset, batch_size=params["batch_size"], shuffle=True, collate_fn=collate_fn_D)
+train_loader = DataLoader(train_dataset, batch_size=params["batch_size"], shuffle=params["shuffle"], collate_fn=collate_fn_D)
 
 '''Initialize model, loss function, and optimizer'''
 model = MscaleDNN(
@@ -78,7 +78,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=params["learning_rate"])
 
 print("Training start!")
 # Training loop
-num_epochs = 2000
+num_epochs = params["total_steps"]
 model.train()
 for epoch in range(num_epochs):
     running_loss = 0.0
