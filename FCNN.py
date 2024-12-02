@@ -116,6 +116,48 @@ class MscaleDNN(nn.Module):
             scaled_x = x * scale
             outputs.append(self.subnets[i](scaled_x))
         return torch.sum(torch.stack(outputs), dim=0)
+    
+    # Set the parameters for the early stop method
+    def Earlystop_set(self, patience=10, delta=0, path=None):
+        self.patience = int(patience)
+        self.delta = delta
+        self.path = path
+        self.counter = 0
+        self.best_loss = None
+        self.early_stop = False
+        self.best_model = None
+        
+    # Logical judgment of executing the early stop method
+    def Earlystop(self, val_loss, model, epoch):
+        if self.best_loss is None:
+            self.best_loss = val_loss
+        elif self.best_loss < val_loss + self.delta:
+            self.counter += 1
+            if self.counter >= self.patience:
+                self.early_stop = True
+        else:
+            self.best_loss = val_loss
+            self.counter = 0
+            
+    # Save the checkpoint of the current optimal model
+    def save_checkpoint(self, val_loss, model):
+        if self.path:
+            checkpoint = {
+                'model_state_dict': model.state_dict(),
+                'loss': val_loss
+            }
+            torch.save(checkpoint, self.path)
+            self.best_model = model.state_dict()
+            
+    # Freeze all trainable parameters  
+    def freeze_all_parameters(self):  
+        for param in self.parameters():  
+            param.requires_grad = False  
+  
+    # Unfreeze all trainable parameters  
+    def unfreeze_all_parameters(self):  
+        for param in self.parameters():  
+            param.requires_grad = True
 
 
 # # Example usage
@@ -133,7 +175,7 @@ class MscaleDNN(nn.Module):
 # # Example usage
 # input_dim = 2          
 # hidden_units = [64, 32] 
-# output_dim = 2          
+# output_dim = 1          
 # scales = [0.5, 1.0, 2.0]  
 # activation = 'sin'     
 

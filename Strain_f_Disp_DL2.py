@@ -26,7 +26,7 @@ params = {
     "activation": "phi",
     "learning_rate": 1e-3,
     "total_steps": 50,
-    "batch_size": 1024*4,
+    "batch_size": 256,
     "roi_path": "./test_data/restructed_image/ROI.bmp",
     "displacement": './test_data/uvmat/star_displacement.mat',
     "ep_patience": 20,

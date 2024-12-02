@@ -46,25 +46,25 @@ model.eval()
 uv = model(torch.stack((Ix, Iy), dim=1))
 u = uv[:, 0:1]
 v = uv[:, 1:2]
-u_x = torch.autograd.grad(u, Ix, grad_outputs=torch.ones_like(u), retain_graph=True, create_graph=True)[0]
-u_y = torch.autograd.grad(u, Iy, grad_outputs=torch.ones_like(u), retain_graph=True, create_graph=True)[0]
-v_x = torch.autograd.grad(v, Ix, grad_outputs=torch.ones_like(v), retain_graph=True, create_graph=True)[0]
-v_y = torch.autograd.grad(v, Iy, grad_outputs=torch.ones_like(v), retain_graph=True, create_graph=True)[0]
+# u_x = torch.autograd.grad(u, Ix, grad_outputs=torch.ones_like(u), retain_graph=True, create_graph=True)[0]
+# u_y = torch.autograd.grad(u, Iy, grad_outputs=torch.ones_like(u), retain_graph=True, create_graph=True)[0]
+# v_x = torch.autograd.grad(v, Ix, grad_outputs=torch.ones_like(v), retain_graph=True, create_graph=True)[0]
+# v_y = torch.autograd.grad(v, Iy, grad_outputs=torch.ones_like(v), retain_graph=True, create_graph=True)[0]
 
-u_x = u_x*2/L; u_y = u_y*2/H; v_x = v_x*2/L; u_y = u_y*2/H; 
+# u_x = u_x*2/L; u_y = u_y*2/H; v_x = v_x*2/L; u_y = u_y*2/H; 
 
 uD = u.detach().cpu().numpy(); vD = v.detach().cpu().numpy()
-ex = u_x.detach().cpu().numpy(); ey = v_y.detach().cpu().numpy()
-exy = (u_y + v_x)/2; exy = exy.detach().cpu().numpy()
+# ex = u_x.detach().cpu().numpy(); ey = v_y.detach().cpu().numpy()
+# exy = (u_y + v_x)/2; exy = exy.detach().cpu().numpy()
 
 U = np.zeros((H, L)); V = np.zeros((H, L))
 Ex = np.zeros((H, L)); Ey = np.zeros((H, L)); Exy = np.zeros((H, L))
 
 U[XY_roi[:,0], XY_roi[:,1]] = uD.squeeze()
 V[XY_roi[:,0], XY_roi[:,1]] = vD.squeeze()
-Ex[XY_roi[:,0], XY_roi[:,1]] = ex
-Ey[XY_roi[:,0], XY_roi[:,1]] = ey
-Exy[XY_roi[:,0], XY_roi[:,1]] = exy
+# Ex[XY_roi[:,0], XY_roi[:,1]] = ex
+# Ey[XY_roi[:,0], XY_roi[:,1]] = ey
+# Exy[XY_roi[:,0], XY_roi[:,1]] = exy
 
 U = sub_matrix(U); V = sub_matrix(V)
 Ex = sub_matrix(Ex); Ey = sub_matrix(Ey); Exy = sub_matrix(Exy)
