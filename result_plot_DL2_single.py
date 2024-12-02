@@ -9,7 +9,7 @@ from utils import sub_matrix
 params = {
     "seed": 0,
     "dim": 2,
-    "hidden_units": [50, 50, 50],
+    "hidden_units": [50, 50, 50, 50, 50],
     "scales": [1, 2, 4, 8, 16, 32, 64],
     "activation": "phi",
     "roi_path": "./test_data/restructed_image/ROI.bmp",
@@ -78,5 +78,6 @@ im = ax.imshow(V, cmap='jet')
 fig.colorbar(im, ax=ax)
 
 plt.tight_layout()
-plt.savefig('./result.png', bbox_inches='tight')
-print(f"Figure saved to {'./result.png'}")
+length = len(params["hidden_units"]); unit = params["hidden_units"][0]
+plt.savefig(f'./result/result_{length}_{unit}.png', bbox_inches='tight')
+print(f"Figure saved to {f'./result/result_{length}_{unit}.png'}")

@@ -2,6 +2,7 @@
 % Clear workspace and figures
 clear; close all; clc;
 
+%% BLOCK 1
 % 1. Parameter Settings
 H = 256; % Image height
 L = 1024; % Image length
@@ -35,6 +36,7 @@ white_noise_matrix_v = mean_value + std_value * randn(m, n);
 u = u + white_noise_matrix_u;
 v = v + white_noise_matrix_v;
 
+%% BLOCK2
 % 7. Plot Image
 figure;
 imshow(v, 'Colormap', jet);
