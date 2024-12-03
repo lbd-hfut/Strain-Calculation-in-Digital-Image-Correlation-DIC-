@@ -71,14 +71,30 @@ class SinActivation(nn.Module):
     def __init__(self):
         super(SinActivation, self).__init__()
     def forward(self, x):
-        return torch.sin(0.1*x)
-
+        return torch.sin(1*x)
+    
 class PhiActivation(nn.Module):
     def __init__(self):
         super(PhiActivation, self).__init__()
         self.relu = nn.ReLU()
     def forward(self, x):
         y = self.relu(x)**2 - 3*self.relu(x-1)**2 + 3*self.relu(x-2)**2 - self.relu(x-3)**2
+        return y
+    
+class SeReLU(nn.Module):
+    def __init__(self):
+        super(SeReLU, self).__init__()
+        self.relu = nn.ReLU()
+    def forward(self, x):
+        y = self.relu(x) * self.relu(1-x)
+        return y
+    
+class SelfAdaptive(nn.Module):
+    def __init__(self):
+        super(SelfAdaptive, self).__init__()
+        self.a = nn.Parameter(torch.tensor(0.2))
+    def forward(self, x):
+        y = 5 * self.a * x
         return y
 
 # Define activation functions
@@ -87,6 +103,7 @@ activation_dict = {
     'sigmoid': nn.Sigmoid(),
     'tanh': nn.Tanh(),
     'leaky_relu': nn.LeakyReLU(),
+    'serelu': SeReLU(),
     'softplus': nn.Softplus(),
     'sin': SinActivation(),
     'phi': PhiActivation(),
@@ -96,19 +113,20 @@ class MscaleDNN(nn.Module):
     def __init__(self, input_dim, hidden_units, output_dim, scales, activation):
         super(MscaleDNN, self).__init__()
         self.scales = scales
-        # self.activation = activation_dict[activation]
-        self.activation = [activation_dict["sin"], activation_dict["phi"], activation_dict["phi"], activation_dict["phi"]]
+        self.activation = activation_dict[activation]
+        # self.activation = [activation_dict["phi"], activation_dict["phi"], activation_dict["phi"], activation_dict["phi"]]
         self.subnets = nn.ModuleList()
-
+        
         for scale in scales:
             layers = []
             prev_units = input_dim
             for i, units in enumerate(hidden_units):
                 layers.append(nn.Linear(prev_units, units))
-                if i < len(hidden_units)-1:
-                    # layers.append(self.activation)
-                    layers.append(self.activation[i])
+                layers.append(SelfAdaptive())
+                layers.append(self.activation)
+                # layers.append(self.activation[i])
                 prev_units = units
+            layers.append(SelfAdaptive())
             layers.append(nn.Linear(prev_units, output_dim))
             self.subnets.append(nn.Sequential(*layers))
 

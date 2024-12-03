@@ -22,19 +22,21 @@ params = {
     "seed": 0,
     "dim": 2,
     "hidden_units": [50, 50, 50],
-    "scales": [1, 2, 4, 8, 16, 32, 64],
-    "activation": "phi",
+    "scales": [1,2,4,8],
+    "activation": "sin",
     "learning_rate": 1e-3,
-    "total_steps": 50,
+    "total_steps": 15,
     "batch_size": 256,
     "roi_path": "./test_data/restructed_image/ROI.bmp",
     "displacement": './test_data/uvmat/star_displacement.mat',
+    "log_prefix": 'star',
     "ep_patience": 20,
     "ep_delta": 0.0001,
     "checkpoint": './checkpoint/checkpoint_adam_star.pth',
     "shuffle": True, 
 }
 
+set_seed(params["seed"])
 
 '''Data preparation'''
 roi_path = params["roi_path"]
@@ -79,6 +81,12 @@ optimizer = torch.optim.Adam(model.parameters(), lr=params["learning_rate"])
 print("Training start!")
 # Training loop
 num_epochs = params["total_steps"]
+layer = len(params["hidden_units"])
+neuron = params["hidden_units"][0]
+acfun = params["activation"]
+scale = len(params["scales"])
+print(params["hidden_units"]); print(params["scales"])
+file = open('./log/'+params["log_prefix"]+f'_{layer}_{neuron}_{acfun}_{scale}.txt', 'w')
 model.train()
 for epoch in range(num_epochs):
     running_loss = 0.0
@@ -103,5 +111,6 @@ for epoch in range(num_epochs):
         print("Early stopping triggered")
         break
     print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {epoch_loss:.4f}')
+    file.write(f"\tEpoch:{epoch+1:02d}/{15}\tMAE\t{epoch_loss:.4f}\n")
 early_stop_adam.save_checkpoint(epoch_loss, model, optimizer)
 print("Training complete!")

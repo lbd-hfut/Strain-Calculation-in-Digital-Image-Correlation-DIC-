@@ -9,8 +9,8 @@ from utils import sub_matrix
 params = {
     "seed": 0,
     "dim": 2,
-    "hidden_units": [50, 50, 50, 50, 50],
-    "scales": [1, 2, 4, 8, 16, 32, 64],
+    "hidden_units": [50, 50, 50],
+    "scales": [1],
     "activation": "phi",
     "roi_path": "./test_data/restructed_image/ROI.bmp",
     "displacement": './test_data/uvmat/star_displacement.mat',

@@ -10,12 +10,11 @@ params = {
     "seed": 0,
     "dim": 2,
     "hidden_units": [50, 50, 50],
-    "scales": [1, 2, 4, 8, 16, 32, 64],
+    "scales": [1,2],
     "activation": "phi",
     "roi_path": "./test_data/restructed_image/ROI.bmp",
     "displacement": './test_data/uvmat/star_displacement.mat',
     "checkpoint": './checkpoint/checkpoint_adam_star.pth',
-    
 }
 
 roi_path = params["roi_path"]
@@ -67,36 +66,18 @@ V[XY_roi[:,0], XY_roi[:,1]] = vD.squeeze()
 # Exy[XY_roi[:,0], XY_roi[:,1]] = exy
 
 U = sub_matrix(U); V = sub_matrix(V)
-Ex = sub_matrix(Ex); Ey = sub_matrix(Ey); Exy = sub_matrix(Exy)
 
+fig, axs = plt.subplots(1, 2, figsize=(15, 6))
 
-fig, axs = plt.subplots(3, 2, figsize=(15, 10))
-
-ax = axs[0, 0]
+ax = axs[0]
 im = ax.imshow(U, cmap='jet')
 fig.colorbar(im, ax=ax)
 
-ax = axs[0, 1]
+ax = axs[1]
 im = ax.imshow(V, cmap='jet')
 fig.colorbar(im, ax=ax)
 
-ax = axs[1, 0]
-im = ax.imshow(Ex, cmap='jet')
-fig.colorbar(im, ax=ax)
-
-ax = axs[1, 1]
-im = ax.imshow(Ey, cmap='jet')
-fig.colorbar(im, ax=ax)
-
-ax = axs[2, 0]
-im = ax.imshow(Exy, cmap='jet')
-fig.colorbar(im, ax=ax)
-
-ax = axs[2, 1]
-im = ax.imshow(np.zeros_like(Exy), cmap='jet')
-fig.colorbar(im, ax=ax)
-
-
 plt.tight_layout()
-plt.savefig('./result.png', bbox_inches='tight')
-print(f"Figure saved to {'./result.png'}")
+length = len(params["hidden_units"]); unit = params["hidden_units"][0]
+plt.savefig(f'./result/result_{length}_{unit}.png', bbox_inches='tight')
+print(f"Figure saved to {f'./result/result_{length}_{unit}.png'}")

@@ -22,8 +22,8 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 params = {
     "seed": 0,
     "dim": 2,
-    "hidden_units": [50, 50, 50, 50],
-    "scales": [1, 2, 4, 8, 16, 32, 64],
+    "hidden_units": [50, 50, 50],
+    "scales": [1],  # , 2, 4, 8, 16, 32, 64
     "activation": "phi",
     "learning_rate": 1e-2,
     "eta_min": 5e-4,

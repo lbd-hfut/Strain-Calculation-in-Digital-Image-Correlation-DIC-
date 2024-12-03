@@ -11,7 +11,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 '''Data preparation'''
-roi_path = "./restructed_image/ROI.bmp"
+roi_path = "./test_data/restructed_image/ROI.bmp"
 roi = Image.open(roi_path).convert('L')
 roi = np.array(roi); roi = roi > 0
 
@@ -19,7 +19,7 @@ H,L = roi.shape
 y = np.linspace(-1, 1, H); x = np.linspace(-1, 1, L); 
 IX, IY = np.meshgrid(x, y)
 
-displacement = sio.loadmat('fpb_displacement.mat')
+displacement = sio.loadmat('./test_data/uvmat/star_displacement.mat')
 u = displacement['u']
 v = displacement['v']
 
@@ -45,7 +45,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
 print("Training start!")
 # Training loop
-num_epochs = 2000
+num_epochs = 15
 model.train()
 for epoch in range(num_epochs):
     running_loss = 0.0
