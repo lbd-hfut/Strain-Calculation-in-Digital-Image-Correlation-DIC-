@@ -7,7 +7,7 @@ clear; close all; clc;
 H = 256; % Image height
 L = 1024; % Image length
 pmax = 120; % Controls the number of stripes on the far left
-pmin = 10;  % Controls the number of stripes on the far right
+pmin = 15;  % Controls the number of stripes on the far right
 
 % 2. Create Grid
 x = 1:L;

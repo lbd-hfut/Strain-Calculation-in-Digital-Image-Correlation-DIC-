@@ -13,7 +13,7 @@ I = 1.0e-6;       % Moment of inertia of the cross-section (m^4)
 % 2. Define the pure bending region
 x_start = a;          % Starting point of the pure bending region
 x_end = a + b;        % End point of the pure bending region
-x = linspace(x_start, x_end, 256);  % x-coordinates within the pure bending region
+x = linspace(x_start, x_end, 1024);  % x-coordinates within the pure bending region
 
 % Define y-coordinates (assuming beam thickness is 10cm, symmetrically distributed)
 y_max = 1;         % Maximum y displacement (meters)

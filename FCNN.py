@@ -135,7 +135,7 @@ class MscaleDNN(nn.Module):
         for i, scale in enumerate(self.scales):
             scaled_x = x * scale
             outputs.append(self.subnets[i](scaled_x))
-        return torch.sum(torch.stack(outputs), dim=0)
+        return torch.mean(torch.stack(outputs), dim=0)
     
     # Set the parameters for the early stop method
     def Earlystop_set(self, patience=10, delta=0, path=None):

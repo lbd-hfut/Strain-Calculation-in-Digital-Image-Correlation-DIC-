@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.linalg import cholesky, solve
 import matplotlib.pyplot as plt
+import scipy.io
 
 def compute_displacement_gradients(u, v, roi, radius_strain, spacing=1):
     """
@@ -28,7 +29,7 @@ def compute_displacement_gradients(u, v, roi, radius_strain, spacing=1):
     left,right,top,bottom = get_roi_bounds(roi)
     for x in range(left, right+1):
         for y in range(top, bottom+1):
-            if roi(y, x)==0:
+            if roi[y, x]==0:
                 continue
             # Extract subset of points (for simplicity, we use a square window around the point)
             subset_points, subset_u, subset_v = get_subset_points(u, v, roi, x, y, radius_strain)
@@ -64,14 +65,14 @@ def compute_displacement_gradients(u, v, roi, radius_strain, spacing=1):
                 mat_LS[1] = mat_LS[3]
                 mat_LS[2] = mat_LS[6]
                 mat_LS[5] = mat_LS[7]
-                mat_LS[8] = len(subset_points)
+                mat_LS[8] = len(subset_points)                  
                 
                 # Cholesky decomposition to solve the system of equations
                 try:
-                    L = cholesky(mat_LS[:6].reshape((3,3)), lower=True)
+                    L = cholesky(mat_LS[: 9].reshape((3,3)), lower=True)
                     # Solve for the gradient parameters using forward and backward substitution
-                    u_grad = solve(L, u_vec_LS[:2])
-                    v_grad = solve(L, v_vec_LS[:2])
+                    u_grad = solve(L, u_vec_LS[:3])
+                    v_grad = solve(L, v_vec_LS[:3])
 
                     # Store the results
                     plot_dudx[y, x] = u_grad[0] / spacing
@@ -99,12 +100,12 @@ def get_subset_points(u, v, roi, x, y, radius):
         for dy in range(-radius, radius+1):
             xi, yi = x + dx, y + dy
             if 0 <= xi < width and 0 <= yi < height:
-                if roi[yi, xi]:
+                if roi[yi, xi] or ~np.isnan(u):
                     points.append((xi, yi))
                     u_vals.append(u[yi, xi])
                     v_vals.append(v[yi, xi])
     
-    if len(points) > 3:
+    if len(points) > 8:
         return points, u_vals, v_vals
     else:
         return None, None, None
@@ -134,32 +135,36 @@ def get_roi_bounds(roi_matrix):
     min_col = cols.min()
     max_col = cols.max()
     
-    return min_row, max_row, min_col, max_col
+    return min_col, max_col, min_row, max_row
 
-# Simulate some displacement fields (u and v) for testing
-height, width = 100, 100
-u = np.random.randn(height, width)  # Horizontal displacement field
-v = np.random.randn(height, width)  # Vertical displacement field
-
-# Define a region of interest (ROI) with a bounding box
-roi = np.zeros_like(u, dtype=bool); roi[20:80,20:80]=True
-
-# Define strain window radius and conversion factors
-radius_strain = 3
-pixtounits = 1.0  # No conversion for simplicity
-spacing = 1  # 1 pixel spacing
-
-# Compute the displacement gradients
-dudx, dudy, dvdx, dvdy, validpoints = compute_displacement_gradients(u, v, roi, radius_strain, pixtounits, spacing)
-
-# Visualize the results
-fig, ax = plt.subplots(1, 4, figsize=(15, 5))
-ax[0].imshow(dudx, cmap='jet')
-ax[0].set_title('dudx')
-ax[1].imshow(dudy, cmap='jet')
-ax[1].set_title('dudy')
-ax[2].imshow(dvdx, cmap='jet')
-ax[2].set_title('dvdx')
-ax[3].imshow(dvdy, cmap='jet')
-ax[3].set_title('dvdy')
-plt.show()
+if __name__ == "__main__":
+    # Simulate some displacement fields (u and v) for testing
+    height, width = 256, 1024
+    # u = np.random.randn(height, width)  # Horizontal displacement field
+    # v = np.random.randn(height, width)  # Vertical displacement field
+    mat_data = scipy.io.loadmat('./test_data/uvmat/fpb_displacement.mat')
+    u = mat_data['u']
+    v = mat_data['v']
+    
+    # Define a region of interest (ROI) with a bounding box
+    roi = np.ones_like(u, dtype=bool)#; roi[20:256-20,20:1024-20]=True
+    
+    # Define strain window radius and conversion factors
+    radius_strain = 1
+    pixtounits = 1.0  # No conversion for simplicity
+    spacing = 1  # 1 pixel spacing
+    
+    # Compute the displacement gradients
+    dudx, dudy, dvdx, dvdy, validpoints = compute_displacement_gradients(u, v, roi, radius_strain)
+    
+    # Visualize the results
+    fig, ax = plt.subplots(1, 4, figsize=(15, 5))
+    ax[0].imshow(dudx, cmap='jet')
+    ax[0].set_title('dudx')
+    ax[1].imshow(dudy, cmap='jet')
+    ax[1].set_title('dudy')
+    ax[2].imshow(dvdx, cmap='jet')
+    ax[2].set_title('dvdx')
+    ax[3].imshow(dvdy, cmap='jet')
+    ax[3].set_title('dvdy')
+    plt.show()
